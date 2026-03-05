@@ -42,11 +42,9 @@ jobs:
           permissions = ""
           display_version = "v1.1.2"
           categories = "Emulator"
-
           manufacturer = "Various"
           systemname = "Arcade (various)"
           systemid = "fb_alpha"
-
           savestate = "true"
           savestate_features = "deterministic"
           cheats = "true"
@@ -62,7 +60,6 @@ jobs:
           disk_control = "false"
           database_match_archive_member = "false"
           database = "FBNeo - Arcade Games"
-
           firmware_count = 23
           firmware0_desc = "fbneo/neogeo.zip (Neo Geo BIOS)"
           firmware0_path = "fbneo/neogeo.zip"
@@ -94,4 +91,53 @@ jobs:
           firmware9_desc = "fbneo/cchip.zip (C-Chip Internal ROM)"
           firmware9_path = "fbneo/cchip.zip"
           firmware9_opt = "true"
-          firmware10_desc
+          firmware10_desc = "fbneo/bubsys.zip (Bubble System BIOS)"
+          firmware10_path = "fbneo/bubsys.zip"
+          firmware10_opt = "true"
+          firmware11_desc = "fbneo/namcoc69.zip (Namco C69 BIOS)"
+          firmware11_path = "fbneo/namcoc69.zip"
+          firmware11_opt = "true"
+          firmware12_desc = "fbneo/namcoc70.zip (Namco C70 BIOS)"
+          firmware12_path = "fbneo/namcoc70.zip"
+          firmware12_opt = "true"
+          firmware13_desc = "fbneo/namcoc75.zip (Namco C75 BIOS)"
+          firmware13_path = "fbneo/namcoc75.zip"
+          firmware13_opt = "true"
+          firmware14_desc = "fbneo/coleco.zip (ColecoVision System BIOS)"
+          firmware14_path = "fbneo/coleco.zip"
+          firmware14_opt = "true"
+          firmware15_desc = "fbneo/fdsbios.zip (FDS System BIOS)"
+          firmware15_path = "fbneo/fdsbios.zip"
+          firmware15_opt = "true"
+          firmware16_desc = "fbneo/msx.zip (MSX1 System BIOS)"
+          firmware16_path = "fbneo/msx.zip"
+          firmware16_opt = "true"
+          firmware17_desc = "fbneo/ngp.zip (NeoGeo Pocket BIOS)"
+          firmware17_path = "fbneo/ngp.zip"
+          firmware17_opt = "true"
+          firmware18_desc = "fbneo/spectrum.zip (ZX Spectrum BIOS)"
+          firmware18_path = "fbneo/spectrum.zip"
+          firmware18_opt = "true"
+          firmware19_desc = "fbneo/spec128.zip (ZX Spectrum 128 BIOS)"
+          firmware19_path = "fbneo/spec128.zip"
+          firmware19_opt = "true"
+          firmware20_desc = "fbneo/spec1282a.zip (ZX Spectrum 128 +2a BIOS)"
+          firmware20_path = "fbneo/spec1282a.zip"
+          firmware20_opt = "true"
+          firmware21_desc = "fbneo/channelf.zip (Fairchild Channel F BIOS)"
+          firmware21_path = "fbneo/channelf.zip"
+          firmware21_opt = "true"
+          firmware22_desc = "fbneo/hiscore.dat (High Score support database)"
+          firmware22_path = "fbneo/hiscore.dat"
+          firmware22_opt = "true"
+          notes = "(!) Optimized iOS build by fenguzi. Supporting specialized hacks.|(!) The BIOS files can also be inside the ROM directory or the root of SYSTEM directory."
+          description = "FinalBurn Neo Plus - Custom iOS build by fenguzi. Compatible with specialized ROM hacks."
+          EOF
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FBNeo_Plus_iOS_fenguzi_Final
+          path: |
+            fbneo.plus.libretro
+            fbneo.plus.libretro.info
