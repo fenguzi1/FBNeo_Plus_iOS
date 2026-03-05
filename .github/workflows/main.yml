@@ -7,22 +7,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Build Core
+      - name: Build and Package
         run: |
-          # 1. 强制进入 libretro 源码目录
-          # 如果路径不存在，ls 会报错帮助我们定位
-          ls -R src/burner/libretro || echo "Directory not found!"
-          cd src/burner/libretro
+          # 1. 直接进入核心源码目录并编译
+          # 我们使用 -C 参数直接指定目录，这样更稳
+          echo "Starting build..."
+          make -C src/burner/libretro -f Makefile.libretro platform=ios-arm64 -j$(sysctl -n hw.ncpu)
           
-          # 2. 执行编译 (iOS arm64)
-          make -f Makefile.libretro platform=ios-arm64 -j$(sysctl -n hw.ncpu)
+          # 2. 将生成的核心重命名并移动到根目录
+          # 刚才日志确认了路径就在 src/burner/libretro
+          mv src/burner/libretro/fbneo_libretro_ios.dylib ./fbneo_plus
           
-          # 3. 寻找生成的 dylib 并移动到根目录
-          # 编译出来的文件名通常是 fbneo_libretro_ios.dylib
-          mv *.dylib ../../../fbneo_plus
-          
-      - name: Create Info File
-        run: |
+          # 3. 创建 Info 文件
           cat <<EOF > fbneo_plus.info
           display_name = "Arcade (FBNeo Plus - Hack Edition)"
           authors = "Team FBNeo & lrf739146825"
