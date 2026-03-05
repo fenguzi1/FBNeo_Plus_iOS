@@ -1,0 +1,39 @@
+name: Build FBNeo Plus for iOS
+on: [workflow_dispatch] # 手动触发
+
+jobs:
+  build_ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Core
+        run: |
+          make -f Makefile.libretro platform=ios-arm64 -j$(sysctl -n hw.ncpu)
+          # 将生成的核心重命名为 fbneo_plus
+          mv fbneo_libretro_ios.dylib fbneo_plus
+          
+      - name: Create Info File
+        run: |
+          cat <<EOF > fbneo_plus.info
+          display_name = "Arcade (FBNeo Plus - Hack Edition)"
+          authors = "Team FBNeo & lrf739146825"
+          supported_extensions = "zip|7z|dat|neogeo"
+          corename = "FBNeo Plus"
+          manufacturer = "Various"
+          categories = "Emulator"
+          systemname = "Arcade (various)"
+          database = "FBNeo - Arcade Games"
+          license = "Non-commercial"
+          permissions = ""
+          display_version = "v1.0.0.3"
+          supports_no_game = "false"
+          EOF
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FBNeo_Plus_iOS
+          path: |
+            fbneo_plus
+            fbneo_plus.info
