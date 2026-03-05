@@ -1,5 +1,5 @@
 name: Build FBNeo Plus for iOS
-on: [workflow_dispatch] # 手动触发
+on: [workflow_dispatch]
 
 jobs:
   build_ios:
@@ -9,15 +9,18 @@ jobs:
       
       - name: Build Core
         run: |
-          # 进入 libretro 源码所在的实际文件夹
-          cd src/burner/libretro/
+          # 1. 自动寻找 Makefile.libretro 所在的目录并进入
+          MAKEFILE_PATH=$(find . -name "Makefile.libretro" | head -n 1)
+          MAKEFILE_DIR=$(dirname "$MAKEFILE_PATH")
+          echo "Found Makefile in: $MAKEFILE_DIR"
+          cd "$MAKEFILE_DIR"
           
-          # 执行编译
+          # 2. 执行编译
           make -f Makefile.libretro platform=ios-arm64 -j$(sysctl -n hw.ncpu)
           
-          # 将生成的核心移动到根目录并重命名
-          # 使用 -f 强制覆盖，确保多次运行不报错
-          mv -f fbneo_libretro_ios.dylib ../../../fbneo_plus
+          # 3. 寻找生成的 dylib 文件并移出到根目录重命名
+          # 无论它生成在哪个深度，都给它揪出来
+          find ../../../ -name "*.dylib" -exec mv {} ../../../fbneo_plus \; || find ./ -name "*.dylib" -exec mv {} ../../../fbneo_plus \;
           
       - name: Create Info File
         run: |
