@@ -11,47 +11,53 @@ jobs:
 
       - name: Build Core
         run: |
-          # 1. 尝试进入 libretro 目录
-          # 根据日志，源码应该在 src 目录下
+          # 1. 自动化修改源码 (修正左下角显示与名称)
+          TARGET_FILE="src/burner/libretro/libretro.cpp"
+          if [ -f "$TARGET_FILE" ]; then
+            echo "Modifying source code for custom branding..."
+            # 暴力替换版本号计算行为 v1.1.2 并保留 GIT 散列
+            sed -i '' 's/sprintf(library_version, "v%x.%x.%x.%02x %s %s".*/sprintf(library_version, "v1.1.2 GIT%s", GIT_VERSION);/' "$TARGET_FILE"
+            # 将显示名称从原版 APP_TITLE 替换为 "FBNeo Plus"
+            sed -i '' 's/info->library_name *= *APP_TITLE;/info->library_name = "FBNeo Plus";/' "$TARGET_FILE"
+          fi
+
+          # 2. 进入目录并编译
           if [ -d "src/burner/libretro" ]; then
             cd src/burner/libretro
           elif [ -d "src/libretro" ]; then
             cd src/libretro
           fi
           
-          echo "Current Dir: $(pwd)"
-          
-          # 2. 强行执行编译
-          # 如果找不到 Makefile.libretro，就尝试用通用的 make 指令
-          # 很多修改版可能直接用了主 Makefile 并通过参数切换
+          echo "Starting compilation for iOS ARM64..."
           if [ -f "Makefile.libretro" ]; then
              make -f Makefile.libretro platform=ios-arm64 -j$(sysctl -n hw.ncpu)
-          elif [ -f "Makefile" ]; then
-             make platform=ios-arm64 -j$(sysctl -n hw.ncpu)
           else
-             # 如果实在没有，就回到根目录用主 Makefile 尝试编译 libretro 目标
-             cd ${{ github.workspace }}
-             make -f makefile.sdl platform=ios-arm64 -j$(sysctl -n hw.ncpu) || make platform=ios-arm64 -j$(sysctl -n hw.ncpu)
+             make platform=ios-arm64 -j$(sysctl -n hw.ncpu)
           fi
           
-          # 3. 提取编译出的文件
-          find ${{ github.workspace }} -name "*.dylib" -exec mv {} ${{ github.workspace }}/fbneo_plus \;
+          # 3. 提取并规范命名 (参考 fceumm.libretro 格式)
+          find . -name "*.dylib" -exec cp {} ${{ github.workspace }}/fbneo_plus.libretro \;
           
       - name: Create Info File
         run: |
-          cat <<EOF > fbneo_plus.info
-          display_name = "Arcade (FBNeo Plus - Hack Edition)"
-          authors = "Team FBNeo & lrf739146825"
-          supported_extensions = "zip|7z|dat|neogeo"
-          corename = "FBNeo Plus"
+          # 生成匹配核心的 info 文件
+          cat <<EOF > fbneo_plus.libretro.info
+          display_name = "Arcade (FBNeo Plus)"
+          authors = "Team FBNeo, lrf739146825 & fenguzi"
+          supported_extensions = "zip|7z|cue|ccd|dat|neogeo"
+          corename = "fbneo_plus"
+          license = "Non-commercial"
+          display_version = "v1.1.2"
+          categories = "Emulator"
           systemname = "Arcade (various)"
-          display_version = "v1.0.0.3"
+          database = "FBNeo - Arcade Games"
+          notes = "iOS optimized build by fenguzi. Supporting specialized hacks."
           EOF
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: FBNeo_Plus_iOS
+          name: FBNeo_Plus_iOS_fenguzi_Build
           path: |
-            fbneo_plus
-            fbneo_plus.info
+            fbneo_plus.libretro
+            fbneo_plus.libretro.info
