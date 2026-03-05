@@ -30,8 +30,8 @@ jobs:
           fi
           
           find . -name "*.dylib" -exec cp {} ${{ github.workspace }}/fbneo.plus.libretro \;
-          
-- name: Create Info File
+
+      - name: Create Info File
         run: |
           cat <<EOF > fbneo.plus.libretro.info
           # Software Information
